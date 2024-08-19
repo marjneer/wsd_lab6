@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group input.valid {
+            border-color: green;
+        }
+        .form-group input.invalid {
+            border-color: red;
+        }
+        .form-group .feedback {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: red;
+        }
+        .form-group .feedback.valid {
+            color: green;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h2>Registration Form</h2>
+    <form id="registrationForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <div class="feedback" id="nameFeedback"></div>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <div class="feedback" id="emailFeedback"></div>
+        </div>
+        <div class="form-group">
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+            <div class="feedback" id="dobFeedback"></div>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <div class="feedback" id="passwordFeedback"></div>
+        </div>
+        <button type="submit" id="submitBtn">Submit</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registrationForm');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const dobInput = document.getElementById('dob');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Utility function to show feedback
+            function showFeedback(element, message, isValid) {
+                const feedbackElement = document.getElementById(element.id + 'Feedback');
+                feedbackElement.textContent = message;
+                if (isValid) {
+                    feedbackElement.classList.remove('invalid');
+                    feedbackElement.classList.add('valid');
+                    element.classList.remove('invalid');
+                    element.classList.add('valid');
+                } else {
+                    feedbackElement.classList.remove('valid');
+                    feedbackElement.classList.add('invalid');
+                    element.classList.remove('valid');
+                    element.classList.add('invalid');
+                }
+            }
+
+            // Validate Name
+            function validateName() {
+                const name = nameInput.value.trim();
+                if (name.length >= 3) {
+                    showFeedback(nameInput, '', true);
+                    return true;
+                } else {
+                    showFeedback(nameInput, 'Name must be at least 3 characters long.', false);
+                    return false;
+                }
+            }
+
+            // Validate Email
+            function validateEmail() {
+                const email = emailInput.value.trim();
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (regex.test(email)) {
+                    showFeedback(emailInput, '', true);
+                    return true;
+                } else {
+                    showFeedback(emailInput, 'Please enter a valid email address.', false);
+                    return false;
+                }
+            }
+
+            // Validate Date of Birth and check age
+            function validateDOB() {
+                const dob = dobInput.value;
+                const today = new Date();
+                const birthDate = new Date(dob);
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDifference = today.getMonth() - birthDate.getMonth();
+
+                if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                if (age >= 18) {
+                    showFeedback(dobInput, '', true);
+                    return true;
+                } else {
+                    showFeedback(dobInput, 'You must be at least 18 years old.', false);
+                    return false;
+                }
+            }
+
+            // Validate Password
+            function validatePassword() {
+                const password = passwordInput.value.trim();
+                if (password.length >= 6) {
+                    showFeedback(passwordInput, 'Strong password', true);
+                    return true;
+                } else {
+                    showFeedback(passwordInput, 'Password must be at least 6 characters long.', false);
+                    return false;
+                }
+            }
+
+            // Attach event listeners
+            nameInput.addEventListener('input', validateName);
+            emailInput.addEventListener('input', validateEmail);
+            dobInput.addEventListener('input', validateDOB);
+            passwordInput.addEventListener('input', validatePassword);
+
+            // Disable submit button initially
+            submitBtn.disabled = true;
+
+            // Enable submit button if all validations pass
+            function enableSubmit() {
+                if (validateName() && validateEmail() && validateDOB() && validatePassword() && validateConfirmPassword()) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+            }
+
+            // Attach event listeners to validate and enable submit
+            form.addEventListener('input', enableSubmit);
+
+            // Validate on form submission
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                if (validateName() && validateEmail() && validateDOB() && validatePassword() && validateConfirmPassword()) {
+                    alert('Form submitted successfully!');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
