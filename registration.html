@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+    <h2 class="text-2xl font-semibold mb-6">Registration Form</h2>
+    <form id="registrationForm" class="space-y-4">
+        <div class="form-group">
+            <label for="name" class="block font-medium text-gray-700">Name:</label>
+            <input type="text" id="name" name="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
+            <div class="feedback text-red-500 text-sm mt-1" id="nameFeedback"></div>
+        </div>
+        <div class="form-group">
+            <label for="email" class="block font-medium text-gray-700">Email:</label>
+            <input type="email" id="email" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
+            <div class="feedback text-red-500 text-sm mt-1" id="emailFeedback"></div>
+        </div>
+        <div class="form-group">
+            <label for="dob" class="block font-medium text-gray-700">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
+            <div class="feedback text-red-500 text-sm mt-1" id="dobFeedback"></div>
+        </div>
+        <div class="form-group">
+            <label for="password" class="block font-medium text-gray-700">Password:</label>
+            <input type="password" id="password" name="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
+            <div class="feedback text-red-500 text-sm mt-1" id="passwordFeedback"></div>
+        </div>
+        <button type="submit" id="submitBtn" class="w-full py-2 px-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md shadow-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>Submit</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registrationForm');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const dobInput = document.getElementById('dob');
+            const passwordInput = document.getElementById('password');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Utility function to show feedback
+            function showFeedback(element, message, isValid) {
+                const feedbackElement = document.getElementById(element.id + 'Feedback');
+                feedbackElement.textContent = message;
+                if (isValid) {
+                    feedbackElement.classList.remove('text-red-500');
+                    feedbackElement.classList.add('text-green-500');
+                    element.classList.remove('border-red-500');
+                    element.classList.add('border-green-500');
+                } else {
+                    feedbackElement.classList.remove('text-green-500');
+                    feedbackElement.classList.add('text-red-500');
+                    element.classList.remove('border-green-500');
+                    element.classList.add('border-red-500');
+                }
+            }
+
+            // Validate Name
+            function validateName() {
+                const name = nameInput.value.trim();
+                if (name.length >= 3) {
+                    showFeedback(nameInput, '', true);
+                    return true;
+                } else {
+                    showFeedback(nameInput, 'Name must be at least 3 characters long.', false);
+                    return false;
+                }
+            }
+
+            // Validate Email
+            function validateEmail() {
+                const email = emailInput.value.trim();
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (regex.test(email)) {
+                    showFeedback(emailInput, '', true);
+                    return true;
+                } else {
+                    showFeedback(emailInput, 'Please enter a valid email address.', false);
+                    return false;
+                }
+            }
+
+            // Validate Date of Birth and check age
+            function validateDOB() {
+                const dob = dobInput.value;
+                const today = new Date();
+                const birthDate = new Date(dob);
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDifference = today.getMonth() - birthDate.getMonth();
+
+                if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                if (age >= 18) {
+                    showFeedback(dobInput, '', true);
+                    return true;
+                } else {
+                    showFeedback(dobInput, 'You must be at least 18 years old.', false);
+                    return false;
+                }
+            }
+
+            // Validate Password
+            function validatePassword() {
+                const password = passwordInput.value.trim();
+                if (password.length >= 6) {
+                    showFeedback(passwordInput, 'Strong password', true);
+                    return true;
+                } else {
+                    showFeedback(passwordInput, 'Password must be at least 6 characters long.', false);
+                    return false;
+                }
+            }
+
+            // Attach event listeners
+            nameInput.addEventListener('input', validateName);
+            emailInput.addEventListener('input', validateEmail);
+            dobInput.addEventListener('input', validateDOB);
+            passwordInput.addEventListener('input', validatePassword);
+
+            // Disable submit button initially
+            submitBtn.disabled = true;
+
+            // Enable submit button if all validations pass
+            function enableSubmit() {
+                if (validateName() && validateEmail() && validateDOB() && validatePassword()) {
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.disabled = true;
+                }
+            }
+
+            // Attach event listeners to validate and enable submit
+            form.addEventListener('input', enableSubmit);
+
+            // Validate on form submission
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                if (validateName() && validateEmail() && validateDOB() && validatePassword()) {
+                    alert('Form submitted successfully!');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
